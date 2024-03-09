@@ -1,0 +1,24 @@
+name: Runner for terraform 
+run-name: initalize terraform and applying infra
+on: 
+    pull_request :
+      types: 
+        - opened 
+        - reopened
+      branches: 
+        - main
+jobs:
+    intialize-terraform-and-deploy:
+        runs-on: ubuntu-latest
+        steps:
+         - uses: actions/checkout@v4
+         - uses: hashicorp/setup-terraform@v3
+         
+         - name: Terraform downloading the binaries for the required provided 
+           run: terraform init 
+
+         - name: Terraform format checker 
+           run: terraform fmt -check
+           
+         - name: Status check to validate Terraform validate 
+           run: terraform validate

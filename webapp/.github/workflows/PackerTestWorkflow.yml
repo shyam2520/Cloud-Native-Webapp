@@ -1,0 +1,36 @@
+name: Tester for Packer
+run-name: initalize packer and applying infra
+env: 
+  GOOGLE_PROJECT_ID: ${{secrets.GOOGLE_PROJECT_ID}} #required for validation 
+on: 
+    pull_request :
+      types: 
+        - opened 
+        - reopened
+      branches: 
+        - main
+jobs:
+    intialize-packer-and-deploy:
+        runs-on: ubuntu-latest
+        steps:
+         - uses: actions/checkout@v4
+         - uses: hashicorp/setup-packer@main
+           with:
+            version: 1.10.1
+
+         - name : creating temp zip for packer # requiered for validation 
+           run: zip -r webapp-main.zip ./* 
+
+         - name: packer format check 
+           run: packer fmt -check packer/templates/packer.pkr.hcl
+
+         - name: packer downloading the binaries for the required provided 
+           run:  packer init packer/templates/packer.pkr.hcl 
+
+         - name: Status check to validate packer validate 
+           run: packer validate  packer/templates/packer.pkr.hcl
+   
+         - name: rm created zip
+           run: rm -rf webapp-main.zip
+        
+        #  - name: Remove created zip 
